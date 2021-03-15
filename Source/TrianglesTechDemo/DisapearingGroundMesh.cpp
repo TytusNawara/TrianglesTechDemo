@@ -82,7 +82,7 @@ void ADisapearingGroundMesh::LoadDataFromStaticMesh()
 
                 }
             }
-            // CustomMesh->CreateMeshSection(1, Vertices, Triangles, normals, UV0, vertexColors, tangents, false);
+            // CustomMesh->CreateMeshSection(1, Vertices, Triangles, normals, UV0, vertexColors, tangents, true);
             // CustomMesh->SetMaterial(0, MaterialInstance);
             
             // MaterialInstance = meshToCopy->GetMaterial(0);
@@ -156,18 +156,23 @@ void ADisapearingGroundMesh::Tick(float DeltaTime)
         float distance = FVector2D::Distance(avarage, positionOfPlayer);
         // UE_LOG(LogTemp, Warning, TEXT("distance %f"), distance);
 
+        FVector midEdgeOfTriangle = (Vertices[i + 2] + Vertices[i + 1]) / 2.0f;
+        FVector middleOfTriangle = Vertices[i] + ((midEdgeOfTriangle - Vertices[i]) * (2.0f / 3.0f));
+
     	if(distance > renderCircleRadius)
     	{
+            
             for (int32 k = i; k < i + 3; k++)
             {
-                Vertices[k] -= FVector(0, 0, 2);
+                Vertices[k] += (midEdgeOfTriangle - Vertices[k]).GetSafeNormal();
             }
     	}
-        else
+        else 
         {
             for (int32 k = i; k < i + 3; k++)
             {
-                Vertices[k] = VerteciesAtBegining[k];
+               
+                Vertices[k] -= (midEdgeOfTriangle - Vertices[k]).GetSafeNormal();
             }
         }
 
