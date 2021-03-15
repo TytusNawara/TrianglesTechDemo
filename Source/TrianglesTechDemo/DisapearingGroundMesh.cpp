@@ -53,9 +53,7 @@ void ADisapearingGroundMesh::ExpandMesh()
 
 void ADisapearingGroundMesh::LoadDataFromStaticMesh()
 {
-       
-        
-
+      
         if (meshToCopy)
         {
             FPositionVertexBuffer* vertexPositionBuffer = &meshToCopy->RenderData->LODResources[0].VertexBuffers.PositionVertexBuffer;
@@ -89,6 +87,8 @@ void ADisapearingGroundMesh::LoadDataFromStaticMesh()
             // UE_LOG(LogTemp, Warning, TEXT("CREATED LANDSCAPE"));
 
         }
+
+        ScaleOfTriangles.Init(1.0f, Vertices.Num());
 
 }
 
@@ -159,24 +159,30 @@ void ADisapearingGroundMesh::Tick(float DeltaTime)
         FVector midEdgeOfTriangle = (Vertices[i + 2] + Vertices[i + 1]) / 2.0f;
         FVector middleOfTriangle = Vertices[i] + ((midEdgeOfTriangle - Vertices[i]) * (2.0f / 3.0f));
 
+        float scaleDifference = 0.01f * triangleScalingSpeed;
+
+        float& scaleOfTrianglesI = ScaleOfTriangles[i];
+       
+
     	if(distance > renderCircleRadius)
     	{
-            
-            for (int32 k = i; k < i + 3; k++)
-            {
-                Vertices[k] += (midEdgeOfTriangle - Vertices[k]).GetSafeNormal();
-            }
+            if (scaleOfTrianglesI > scaleDifference)
+                scaleOfTrianglesI -= scaleDifference;
+            else
+                scaleOfTrianglesI = 0.0f;
     	}
         else 
         {
-            for (int32 k = i; k < i + 3; k++)
-            {
-               
-                Vertices[k] -= (midEdgeOfTriangle - Vertices[k]).GetSafeNormal();
-            }
+            if (scaleOfTrianglesI < 1.0f - scaleDifference)
+                scaleOfTrianglesI += scaleDifference;
+            else
+                scaleOfTrianglesI = 1.0f;
         }
 
-
+        for (int32 k = i; k < i + 3; k++)
+        {
+            Vertices[k] = (midEdgeOfTriangle - VerteciesAtBegining[k]) * (1.0f - scaleOfTrianglesI) + VerteciesAtBegining[k];
+        }
     }
 
     CustomMesh->UpdateMeshSection(0, Vertices, normals, UV0, vertexColors, tangents);

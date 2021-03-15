@@ -42,10 +42,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float renderCircleRadius = 1000.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float triangleScalingSpeed = 1.0f;
+
 
 	/* The vertices of the mesh */
 	TArray<FVector> Vertices;
 	TArray<FVector> VerteciesAtBegining;
+	
+	TArray<float> ScaleOfTriangles;
 
 	/* The triangles of the mesh */
 	TArray<int32> Triangles;
